@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//c/Users/Sergei Kabanov/Documents/celestial-explorer/frontend/src/**)"
+    ]
+  }
+}
