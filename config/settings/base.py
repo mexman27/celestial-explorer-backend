@@ -117,7 +117,7 @@ LOGGING = {
 
 REST_FRAMEWORK = {
     "DEFAULT_PAGINATION_CLASS": "apps.gaia.pagination.CatalogPagination",
-    "PAGE_SIZE": 50,
+    "PAGE_SIZE": 5000,
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.AllowAny",
     ],
