@@ -1,6 +1,9 @@
+import logging
 import re
 
 import requests
+
+logger = logging.getLogger(__name__)
 
 NASA_TAP_URL = "https://exoplanetarchive.ipac.caltech.edu/TAP/sync"
 
@@ -22,22 +25,27 @@ class ExoplanetArchiveClient:
 
         Returns a list of row dicts.
         """
+        cleaned = _clean_adql(adql)
+        logger.debug("NASA ADQL query: %s", cleaned)
         response = requests.post(
             NASA_TAP_URL,
             data={
                 "REQUEST": "doQuery",
                 "LANG": "ADQL",
                 "FORMAT": "json",
-                "QUERY": _clean_adql(adql),
+                "QUERY": cleaned,
                 "MAXREC": str(max_rec),
             },
             timeout=self.timeout,
         )
         response.raise_for_status()
-        return response.json()
+        rows = response.json()
+        logger.info("NASA query returned %d rows", len(rows))
+        return rows
 
     def query_confirmed_planets(self, max_distance_pc=50, limit=5000):
         """Fetch confirmed exoplanets within a given distance."""
+        logger.info("Fetching planets within %s pc (limit=%d)", max_distance_pc, limit)
         adql = f"""
             SELECT TOP {limit}
                 pl_name, hostname, discoverymethod,

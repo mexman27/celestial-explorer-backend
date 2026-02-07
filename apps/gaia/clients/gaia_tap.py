@@ -1,6 +1,9 @@
+import logging
 import re
 
 import requests
+
+logger = logging.getLogger(__name__)
 
 GAIA_TAP_URL = "https://gea.esac.esa.int/tap-server/tap/sync"
 PAGE_SIZE = 2000
@@ -23,20 +26,24 @@ class GaiaTapClient:
 
         Returns a list of row dicts.
         """
+        cleaned = _clean_adql(adql)
+        logger.debug("Gaia ADQL query: %s", cleaned)
         response = requests.post(
             GAIA_TAP_URL,
             data={
                 "REQUEST": "doQuery",
                 "LANG": "ADQL",
                 "FORMAT": "json",
-                "QUERY": _clean_adql(adql),
+                "QUERY": cleaned,
                 "MAXREC": str(max_rec),
             },
             timeout=self.timeout,
         )
         response.raise_for_status()
         data = response.json()
-        return self._parse_response(data)
+        rows = self._parse_response(data)
+        logger.info("Gaia query returned %d rows", len(rows))
+        return rows
 
     def query_nearby_stars(self, max_distance_pc=50, limit=None):
         """
@@ -46,6 +53,7 @@ class GaiaTapClient:
         all_rows = []
         offset = 0
         batch_size = PAGE_SIZE
+        logger.info("Fetching stars within %s pc (limit=%s)", max_distance_pc, limit)
 
         while True:
             remaining = (limit - len(all_rows)) if limit else batch_size
@@ -67,6 +75,7 @@ class GaiaTapClient:
             """
             rows = self.query(adql, max_rec=fetch_count)
             all_rows.extend(rows)
+            logger.debug("Batch offset=%d fetched=%d total=%d", offset, len(rows), len(all_rows))
 
             if len(rows) < fetch_count:
                 break
@@ -75,6 +84,7 @@ class GaiaTapClient:
 
             offset += fetch_count
 
+        logger.info("Total stars fetched: %d", len(all_rows))
         return all_rows
 
     def _parse_response(self, data):

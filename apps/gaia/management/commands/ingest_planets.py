@@ -1,4 +1,8 @@
+import logging
+
 from django.core.management.base import BaseCommand
+
+logger = logging.getLogger(__name__)
 
 from apps.gaia.clients.exoplanet_archive import ExoplanetArchiveClient
 from apps.gaia.models import Planet, Star
@@ -32,12 +36,14 @@ class Command(BaseCommand):
         clear = options["clear"]
         dry_run = options["dry_run"]
 
+        logger.info("Fetching up to %d planets within %s pc", limit, max_distance)
         self.stdout.write(f"Fetching up to {limit} planets within {max_distance} pc...")
 
         client = ExoplanetArchiveClient()
         rows = client.query_confirmed_planets(
             max_distance_pc=max_distance, limit=limit,
         )
+        logger.info("Received %d rows from NASA Exoplanet Archive", len(rows))
         self.stdout.write(f"Received {len(rows)} rows from NASA Exoplanet Archive")
 
         if dry_run:
@@ -108,6 +114,7 @@ class Command(BaseCommand):
             else:
                 updated += 1
 
+        logger.info("Planets ingestion done: %d created, %d updated", created, updated)
         self.stdout.write(
             self.style.SUCCESS(
                 f"Done: {created} created, {updated} updated"

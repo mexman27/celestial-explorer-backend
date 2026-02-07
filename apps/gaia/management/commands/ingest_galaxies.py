@@ -1,4 +1,8 @@
+import logging
+
 from django.core.management.base import BaseCommand
+
+logger = logging.getLogger(__name__)
 
 from apps.gaia.models import Galaxy
 from apps.gaia.utils import ra_dec_to_cartesian
@@ -167,6 +171,7 @@ class Command(BaseCommand):
         dry_run = options["dry_run"]
 
         galaxies = LOCAL_GROUP_GALAXIES
+        logger.info("Ingesting %d galaxies", len(galaxies))
         self.stdout.write(f"Ingesting {len(galaxies)} galaxies...")
 
         if dry_run:
@@ -212,6 +217,7 @@ class Command(BaseCommand):
             else:
                 updated += 1
 
+        logger.info("Galaxies ingestion done: %d created, %d updated", created, updated)
         self.stdout.write(
             self.style.SUCCESS(
                 f"Done: {created} created, {updated} updated"

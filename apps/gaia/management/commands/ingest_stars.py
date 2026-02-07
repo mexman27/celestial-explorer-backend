@@ -1,4 +1,8 @@
+import logging
+
 from django.core.management.base import BaseCommand
+
+logger = logging.getLogger(__name__)
 
 from apps.gaia.clients.gaia_tap import GaiaTapClient
 from apps.gaia.models import Star
@@ -33,12 +37,14 @@ class Command(BaseCommand):
         dry_run = options["dry_run"]
 
         label = f"up to {limit}" if limit else "all"
+        logger.info("Fetching %s stars within %s pc", label, max_distance)
         self.stdout.write(f"Fetching {label} stars within {max_distance} pc...")
 
         client = GaiaTapClient()
         rows = client.query_nearby_stars(
             max_distance_pc=max_distance, limit=limit,
         )
+        logger.info("Received %d rows from Gaia TAP", len(rows))
         self.stdout.write(f"Received {len(rows)} rows from Gaia TAP")
 
         if dry_run:
@@ -90,6 +96,7 @@ class Command(BaseCommand):
             else:
                 updated += 1
 
+        logger.info("Stars ingestion done: %d created, %d updated", created, updated)
         self.stdout.write(
             self.style.SUCCESS(
                 f"Done: {created} created, {updated} updated"
