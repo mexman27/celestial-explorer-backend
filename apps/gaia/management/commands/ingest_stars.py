@@ -76,8 +76,6 @@ class Command(BaseCommand):
                         if row.get("teff_gspphot") is not None
                         else None
                     ),
-                    "radius_solar": row.get("radius_gspphot"),
-                    "luminosity_solar": row.get("lum_gspphot"),
                     "proper_motion_ra": row.get("pmra"),
                     "proper_motion_dec": row.get("pmdec"),
                     "radial_velocity": row.get("radial_velocity"),

@@ -1,12 +1,19 @@
+import re
+
 import requests
 
 GAIA_TAP_URL = "https://gea.esac.esa.int/tap-server/tap/sync"
 
 
+def _clean_adql(adql):
+    """Collapse whitespace in ADQL to a single-line query."""
+    return re.sub(r"\s+", " ", adql).strip()
+
+
 class GaiaTapClient:
     """Client for the ESA Gaia TAP (Table Access Protocol) service."""
 
-    def __init__(self, timeout=60):
+    def __init__(self, timeout=120):
         self.timeout = timeout
 
     def query(self, adql, max_rec=500):
@@ -15,13 +22,13 @@ class GaiaTapClient:
 
         Returns a list of row dicts.
         """
-        response = requests.get(
+        response = requests.post(
             GAIA_TAP_URL,
-            params={
+            data={
                 "REQUEST": "doQuery",
                 "LANG": "ADQL",
                 "FORMAT": "json",
-                "QUERY": adql,
+                "QUERY": _clean_adql(adql),
                 "MAXREC": str(max_rec),
             },
             timeout=self.timeout,
@@ -36,8 +43,7 @@ class GaiaTapClient:
             SELECT TOP {limit}
                 source_id, designation,
                 ra, dec, parallax,
-                phot_g_mean_mag, bp_rp,
-                teff_gspphot, radius_gspphot, lum_gspphot,
+                phot_g_mean_mag, bp_rp, teff_gspphot,
                 pmra, pmdec, radial_velocity,
                 distance_gspphot
             FROM gaiadr3.gaia_source

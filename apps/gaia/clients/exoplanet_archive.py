@@ -1,12 +1,19 @@
+import re
+
 import requests
 
 NASA_TAP_URL = "https://exoplanetarchive.ipac.caltech.edu/TAP/sync"
 
 
+def _clean_adql(adql):
+    """Collapse whitespace in ADQL to a single-line query."""
+    return re.sub(r"\s+", " ", adql).strip()
+
+
 class ExoplanetArchiveClient:
     """Client for the NASA Exoplanet Archive TAP service."""
 
-    def __init__(self, timeout=60):
+    def __init__(self, timeout=120):
         self.timeout = timeout
 
     def query(self, adql, max_rec=500):
@@ -15,13 +22,13 @@ class ExoplanetArchiveClient:
 
         Returns a list of row dicts.
         """
-        response = requests.get(
+        response = requests.post(
             NASA_TAP_URL,
-            params={
+            data={
                 "REQUEST": "doQuery",
                 "LANG": "ADQL",
                 "FORMAT": "json",
-                "QUERY": adql,
+                "QUERY": _clean_adql(adql),
                 "MAXREC": str(max_rec),
             },
             timeout=self.timeout,
@@ -34,7 +41,7 @@ class ExoplanetArchiveClient:
         adql = f"""
             SELECT TOP {limit}
                 pl_name, hostname, discoverymethod,
-                disc_year, pl_orbper, pl_orbsma,
+                disc_year, pl_orbper, pl_orbsmax,
                 pl_orbeccen, pl_orbincl,
                 pl_bmasse, pl_bmassj,
                 pl_rade, pl_radj,

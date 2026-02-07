@@ -91,7 +91,7 @@ class Command(BaseCommand):
                         else None
                     ),
                     "orbital_period_days": row.get("pl_orbper"),
-                    "semi_major_axis_au": row.get("pl_orbsma"),
+                    "semi_major_axis_au": row.get("pl_orbsmax"),
                     "eccentricity": row.get("pl_orbeccen"),
                     "inclination_deg": row.get("pl_orbincl"),
                     "discovery_year": row.get("disc_year"),
@@ -136,7 +136,7 @@ class Command(BaseCommand):
         mapping = {
             "Transit": "transit",
             "Radial Velocity": "radial_velocity",
-            "Direct Imaging": "direct_imaging",
+            "Imaging": "direct_imaging",
             "Microlensing": "microlensing",
             "Transit Timing Variations": "timing",
             "Astrometry": "astrometry",
