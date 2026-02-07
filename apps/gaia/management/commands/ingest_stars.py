@@ -10,12 +10,12 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument(
-            "--limit", type=int, default=500,
-            help="Maximum number of stars to fetch (default: 500)",
+            "--limit", type=int, default=None,
+            help="Maximum number of stars to fetch (default: all)",
         )
         parser.add_argument(
-            "--max-distance", type=float, default=500,
-            help="Maximum distance in parsecs (default: 500)",
+            "--max-distance", type=float, default=50,
+            help="Maximum distance in parsecs (default: 50)",
         )
         parser.add_argument(
             "--clear", action="store_true",
@@ -32,7 +32,8 @@ class Command(BaseCommand):
         clear = options["clear"]
         dry_run = options["dry_run"]
 
-        self.stdout.write(f"Fetching up to {limit} stars within {max_distance} pc...")
+        label = f"up to {limit}" if limit else "all"
+        self.stdout.write(f"Fetching {label} stars within {max_distance} pc...")
 
         client = GaiaTapClient()
         rows = client.query_nearby_stars(

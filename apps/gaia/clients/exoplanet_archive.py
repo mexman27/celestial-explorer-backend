@@ -36,7 +36,7 @@ class ExoplanetArchiveClient:
         response.raise_for_status()
         return response.json()
 
-    def query_confirmed_planets(self, max_distance_pc=500, limit=500):
+    def query_confirmed_planets(self, max_distance_pc=50, limit=5000):
         """Fetch confirmed exoplanets within a given distance."""
         adql = f"""
             SELECT TOP {limit}

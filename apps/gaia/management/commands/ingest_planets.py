@@ -10,12 +10,12 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument(
-            "--limit", type=int, default=500,
-            help="Maximum number of planets to fetch (default: 500)",
+            "--limit", type=int, default=5000,
+            help="Maximum number of planets to fetch (default: 5000)",
         )
         parser.add_argument(
-            "--max-distance", type=float, default=500,
-            help="Maximum distance in parsecs (default: 500)",
+            "--max-distance", type=float, default=50,
+            help="Maximum distance in parsecs (default: 50)",
         )
         parser.add_argument(
             "--clear", action="store_true",
